@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference PrivateAssets="All" Include="..\..\App.Commands\App.Commands.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Balance\Balance.Domain\Balance.Domain.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Balance\Balance.Infrastructure\Balance.Infrastructure.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Directories\Directories.Contracnts\Directories.Contracts.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Directories\Directories.Domain\Directories.Domain.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Directories\Directories.Infrastructure\Directories.Infrastructure.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Receipt\Receipt.Domain\Receipt.Domain.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Receipt\Receipt.Infrastructure\Receipt.Infrastructure.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Shipment\Shipment.Contrcts\Shipment.Contracts.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Shipment\Shipment.Domain\Shipment.Domain.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Modules\Shipment\Shipment.Infrastructure\Shipment.Infrastructure.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\Core.Domain\Core.Domain.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\Core.Infrastructure\Core.Infrastructure.csproj" />
+	</ItemGroup>
+
+</Project>

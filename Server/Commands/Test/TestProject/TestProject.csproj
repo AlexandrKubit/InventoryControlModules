@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference PrivateAssets="All" Include="..\..\..\Common\Common.Exceptions\Common.Exceptions.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Core\Core.Domain\Core.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Modules\Balance\Balance.Domain\Balance.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Modules\Directories\Directories.Contracnts\Directories.Contracts.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Modules\Directories\Directories.Domain\Directories.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Modules\Receipt\Receipt.Domain\Receipt.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Modules\Shipment\Shipment.Contrcts\Shipment.Contracts.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Modules\Shipment\Shipment.Domain\Shipment.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

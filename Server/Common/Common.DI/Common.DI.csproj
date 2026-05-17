@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Common.DI</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference PrivateAssets="All" Include="..\..\Commands\App.Commands\App.Commands.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Commands\Core\Core.Domain\Core.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Commands\Modules\Balance\Balance.Domain\Balance.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Commands\Modules\Directories\Directories.Domain\Directories.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Commands\Modules\Receipt\Receipt.Domain\Receipt.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Commands\Modules\Shipment\Shipment.Domain\Shipment.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\Common.Requests\Common.Requests.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\Commands\Core\Core.Data\Core.Data.csproj" />
+    <ProjectReference Include="..\..\Queries\App.Queries\App.Queries.csproj" />
+    <ProjectReference Include="..\..\Commands\Core\Core.Infrastructure\Core.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

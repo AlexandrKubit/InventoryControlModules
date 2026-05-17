@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>App.Queries</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <ProjectReference PrivateAssets="All" Include="..\..\..\Exchange\Exchange.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Common\Common.Exceptions\Common.Exceptions.csproj" />
+	  <ProjectReference PrivateAssets="All" Include="..\..\Common\Common.Requests\Common.Requests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.72" />
+    <PackageReference Include="Npgsql" Version="10.0.2" />
+  </ItemGroup>
+
+</Project>

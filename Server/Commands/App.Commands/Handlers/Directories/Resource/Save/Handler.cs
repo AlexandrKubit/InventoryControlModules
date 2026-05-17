@@ -1,0 +1,26 @@
+﻿namespace App.Commands.Handlers.Directories.Resource.Save;
+
+using Common.Requests;
+using Exchange.Commands.Directories.Resource.Save;
+using global::Directories.Domain.Data;
+using global::Directories.Domain.Entities;
+using System.Threading.Tasks;
+
+[RequestRoute("/Directories/Resource/Save", RequestRouteAttribute.Types.Command)]
+public class Handler(IDirectoriesData data) : IRequestHandler<Request, Guid>
+{
+    public async Task<Guid> HandleAsync(Request request)
+    {
+        if (request.Guid == Guid.Empty)
+        {
+            var resources = await Resource.CreateRange([request.Name], data);
+            return resources.First().Guid;
+        }
+        else
+        {
+            await Resource.UpdateRange([new Resource.UpdateArg(request.Guid, request.Name)], data);
+            return request.Guid;
+        }
+    }
+}
+

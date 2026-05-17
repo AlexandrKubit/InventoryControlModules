@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+	<PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference PrivateAssets="All" Include="..\..\Modules\Directories\Directories.Domain\Directories.Domain.csproj" />
+	<ProjectReference PrivateAssets="All" Include="..\..\Modules\Shipment\Shipment.Domain\Shipment.Domain.csproj" />
+	<ProjectReference PrivateAssets="All" Include="..\Core.Domain\Core.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

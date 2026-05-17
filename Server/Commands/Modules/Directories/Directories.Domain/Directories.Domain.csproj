@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference PrivateAssets="All" Include="..\..\..\..\Common\Common.Exceptions\Common.Exceptions.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\..\Core\Core.Domain\Core.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\Directories.Contracnts\Directories.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

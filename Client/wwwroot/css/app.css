@@ -1,0 +1,8 @@
+thead tr {
+    background-color: lightgray;
+}
+
+td, th {
+    padding-left: 3px;
+    padding-right: 3px;
+}
