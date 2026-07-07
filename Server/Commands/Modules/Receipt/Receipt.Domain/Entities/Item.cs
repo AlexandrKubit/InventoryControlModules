@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Directories.Contracts;
-using I = Receipt.Contracts.ReciptItemContract;
 
 /// <summary>
 /// Ресурс накладной
@@ -17,22 +16,26 @@ public sealed class Item : BaseEntity
     // ресурсы на складе просто так нельзя удалять, добавлять или изменять на складе
     // поэтому баланс подписывается на эти события
     #region Events
-    private static readonly DomainEvent<I.CreatedRangeArg> CreatedRange = new();
-    private static readonly DomainEvent<I.UpdatedRangeArg> UpdatedRange = new();
-    private static readonly DomainEvent<I.DeletedRangeArg> DeletedRange = new();
-    #endregion
+    public record ItemData(Guid ResourceGuid, Guid MeasureUnitGuid, decimal Quantity);
 
-    public static void InitializeContracts()
-    {
-        I.OnCreatedRange = CreatedRange.Subscribe;
-        I.OnUpdatedRange = UpdatedRange.Subscribe;
-        I.OnDeletedRange = DeletedRange.Subscribe;
-    }
+    public record CreatedRangeArg(List<ItemData> Items, IReceiptData Data);
+    private static readonly DomainEvent<CreatedRangeArg> CreatedRange = new();
+    public static Action<Func<CreatedRangeArg, Task>> OnCreatedRange => CreatedRange.Subscribe;
+
+    public record UpdatedRangeArg(List<(ItemData Old, ItemData New)> Changes, IReceiptData Data);
+    private static readonly DomainEvent<UpdatedRangeArg> UpdatedRange = new();
+    public static Action<Func<UpdatedRangeArg, Task>> OnUpdatedRange => UpdatedRange.Subscribe;
+
+    public record DeletedRangeArg(List<ItemData> Items, IReceiptData Data);
+    private static readonly DomainEvent<DeletedRangeArg> DeletedRange = new();
+    public static Action<Func<DeletedRangeArg, Task>> OnDeletedRange => DeletedRange.Subscribe;
+
+    #endregion
 
     static Item()
     {
-        MeasureUnitContract.OnDeletedRange(OnMeasureUnitDeletedRangeHandler);
-        ResourceContract.OnDeletedRange(OnResourceRangeHandler);
+        MeasureUnitContract.DeletedRange += OnMeasureUnitDeletedRangeHandler;
+        ResourceContract.DeletedRange += OnResourceRangeHandler;
     }
 
     public interface IRepository : IBaseRepository<Item>
@@ -87,8 +90,8 @@ public sealed class Item : BaseEntity
             items.Add(item);
         }
 
-        await CreatedRange.Invoke(new I.CreatedRangeArg(
-            items.Select(x => new I.ItemData(x.ResourceGuid, x.MeasureUnitGuid, x.Quantity)).ToList(),
+        await CreatedRange.Invoke(new CreatedRangeArg(
+            items.Select(x => new ItemData(x.ResourceGuid, x.MeasureUnitGuid, x.Quantity)).ToList(),
             data
         ));
         return items;
@@ -101,14 +104,14 @@ public sealed class Item : BaseEntity
         await data.ReceiptItems.EnsureByGuids(guids);
         var items = data.ReceiptItems.List.Where(x => guids.Contains(x.Guid)).ToList();
 
-        List<(I.ItemData Old, I.ItemData New)> сhanges = [];
+        List<(ItemData Old, ItemData New)> сhanges = [];
 
         foreach (var item in items)
         {
             var arg = args.First(x => x.Guid == item.Guid);
 
-            I.ItemData old = new(item.ResourceGuid, item.MeasureUnitGuid, item.Quantity);
-            I.ItemData _new = new(arg.ResourceGuid, arg.MeasureUnitGuid, arg.Quantity);
+            ItemData old = new(item.ResourceGuid, item.MeasureUnitGuid, item.Quantity);
+            ItemData _new = new(arg.ResourceGuid, arg.MeasureUnitGuid, arg.Quantity);
             сhanges.Add((old, _new));
 
             item.ResourceGuid = arg.ResourceGuid;
@@ -117,7 +120,7 @@ public sealed class Item : BaseEntity
             item.Update();
         }
 
-        await UpdatedRange.Invoke(new I.UpdatedRangeArg(сhanges, data));
+        await UpdatedRange.Invoke(new UpdatedRangeArg(сhanges, data));
     }
 
 
@@ -129,8 +132,8 @@ public sealed class Item : BaseEntity
         foreach (var item in items)
             item.Remove();
 
-        await DeletedRange.Invoke(new I.DeletedRangeArg(
-            items.Select(x => new I.ItemData(x.ResourceGuid, x.MeasureUnitGuid, x.Quantity)).ToList(), 
+        await DeletedRange.Invoke(new DeletedRangeArg(
+            items.Select(x => new ItemData(x.ResourceGuid, x.MeasureUnitGuid, x.Quantity)).ToList(), 
             data
         ));
     }

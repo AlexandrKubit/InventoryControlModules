@@ -16,10 +16,6 @@ internal class TestData : IData, IDirectoriesData, IReceiptData, IShipmentData, 
 {
     static TestData()
     {
-        Directories.Domain.ContractsInitializer.Initialize();
-        Receipt.Domain.ContractsInitializer.Initialize();
-        Shipment.Domain.ContractsInitializer.Initialize();
-
         var type = typeof(Core.Domain.BaseEntity);
 
         var balanceAsm = Assembly.GetAssembly(typeof(Balance.Domain.Data.IBalanceData));

@@ -1,4 +1,5 @@
 ﻿namespace Balance.Infrastructure;
+
 using Balance.Domain.Entities;
 using Core.Infrastructure;
 using Microsoft.EntityFrameworkCore;

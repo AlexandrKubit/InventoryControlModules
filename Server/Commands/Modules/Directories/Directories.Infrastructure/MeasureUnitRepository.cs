@@ -1,6 +1,6 @@
 ﻿namespace Directories.Infrastructure;
+
 using Core.Infrastructure;
-using Directories.Contracts;
 using Directories.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using static Directories.Contracts.MeasureUnitContract;
@@ -19,7 +19,7 @@ public class MeasureUnitRepository : BaseRepository<MeasureUnit>, MeasureUnit.IR
         }
     }
     IEnumerable<IMeasureUnitProjection> IMeasureUnitProjectionRepository.List => List.Select(x => new MeasureUnitProjection(x));
-    
+
     private MeasureUnit Restore(Core.Infrastructure.Entities.MeasureUnit unit) =>
         MeasureUnit.IRepository.Restore(unit.Guid, unit.Name, unit.Condition);
 

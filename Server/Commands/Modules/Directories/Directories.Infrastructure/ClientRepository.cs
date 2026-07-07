@@ -1,6 +1,6 @@
 ﻿namespace Directories.Infrastructure;
+
 using Core.Infrastructure;
-using Directories.Contracts;
 using Directories.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using static Directories.Contracts.ClientContract;

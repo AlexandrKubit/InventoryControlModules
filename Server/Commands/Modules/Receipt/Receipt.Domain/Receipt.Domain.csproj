@@ -10,7 +10,6 @@
     <ProjectReference PrivateAssets="All" Include="..\..\..\..\Common\Common.Exceptions\Common.Exceptions.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\..\..\Core\Core.Domain\Core.Domain.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\..\Directories\Directories.Contracnts\Directories.Contracts.csproj" />
-    <ProjectReference PrivateAssets="All" Include="..\Receipt.Contcts\Receipt.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

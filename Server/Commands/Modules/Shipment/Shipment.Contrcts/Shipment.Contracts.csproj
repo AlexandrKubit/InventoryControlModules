@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference PrivateAssets="All" Include="..\..\..\Core\Core.Domain\Core.Domain.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\Shipment.Domain\Shipment.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,12 @@
 ﻿namespace Balance.Domain.Entities;
+
 using Common.Exceptions;
 using Core.Domain;
+using global::Balance.Domain.Data;
+using Receipt.Contracts;
+using Shipment.Contracts;
 using System;
 using System.Threading.Tasks;
-using Receipt.Contracts;
-using global::Balance.Domain.Data;
-using Shipment.Contracts;
 
 /// <summary>
 /// Баланс (свободный остаток на склада)
@@ -25,15 +26,15 @@ public sealed class Balance : BaseEntity
     // подписываемся на события 
     static Balance()
     {
-        ReciptItemContract.OnCreatedRange(OnReceiptItemCreatedRangeHandler);
-        ReciptItemContract.OnUpdatedRange(OnReceiptItemUpdatedRangeHandler);
-        ReciptItemContract.OnDeletedRange(OnReceiptItemDeletedRangeHandler);
+        ReciptItemContract.CreatedRange += OnReceiptItemCreatedRangeHandler;
+        ReciptItemContract.UpdatedRange += OnReceiptItemUpdatedRangeHandler;
+        ReciptItemContract.DeletedRange += OnReceiptItemDeletedRangeHandler;
 
-        ShipmentContract.OnSignedRange(OnShipmentDocumentSignedRangeHandler);
-        ShipmentContract.OnUnsignedRange(OnShipmentDocumentUnsignedRangeHandler);
+        ShipmentContract.SignedRange += OnShipmentDocumentSignedRangeHandler;
+        ShipmentContract.UnsignedRange += OnShipmentDocumentUnsignedRangeHandler;
 
-        Directories.Contracts.MeasureUnitContract.OnDeletedRange(OnMeasureUnitDeletedRangeHandler);
-        Directories.Contracts.ResourceContract.OnDeletedRange(OnResourceDeletedRangeHandler);
+        Directories.Contracts.MeasureUnitContract.DeletedRange += OnMeasureUnitDeletedRangeHandler;
+        Directories.Contracts.ResourceContract.DeletedRange += OnResourceDeletedRangeHandler;
     }
 
     public Guid ResourceGuid { get; }

@@ -1,4 +1,5 @@
 ﻿namespace Directories.Domain.Data;
+
 using Core.Domain;
 using Directories.Domain.Entities;
 

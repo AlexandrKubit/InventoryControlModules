@@ -1,9 +1,9 @@
 ﻿namespace Shipment.Domain.Entities;
+
 using Common.Exceptions;
 using Core.Domain;
 using Shipment.Domain.Data;
 using System.Threading.Tasks;
-using S = Shipment.Contracts.ShipmentContract;
 
 /// <summary>
 /// Документ отгрузки
@@ -14,16 +14,15 @@ public sealed class Document : BaseEntity
     // ресурсы на складе просто так нельзя удалять, добавлять или изменять на складе
     // поэтому баланс подписывается на эти события
     #region Events
-    private static readonly DomainEvent<S.SignedRangeArg> SignedRange = new(); // один подписчик - баланс на складе, порядок не важен  
-    private static readonly DomainEvent<S.UnsignedRangeArg> UnsignedRange = new(); // один подписчик - баланс на складе, порядок не важен  
+    public record SignedRangeArg(HashSet<Guid> DocumentGuids, IData Data);
+    private static readonly DomainEvent<SignedRangeArg> SignedRange = new(); // один подписчик - баланс на складе, порядок не важен  
+    public static Action<Func<SignedRangeArg, Task>> OnSignedRange => SignedRange.Subscribe;
+
+    public record UnsignedRangeArg(HashSet<Guid> DocumentGuids, IData Data);
+    private static readonly DomainEvent<UnsignedRangeArg> UnsignedRange = new(); // один подписчик - баланс на складе, порядок не важен  
+    public static Action<Func<UnsignedRangeArg, Task>> OnUnsignedRange => UnsignedRange.Subscribe;
+
     #endregion
-
-    public static void InitializeContracts()
-    {
-        S.OnSignedRange = SignedRange.Subscribe;
-        S.OnUnsignedRange = UnsignedRange.Subscribe;
-    }
-
 
     public interface IRepository : IBaseRepository<Document>
     {
@@ -125,10 +124,13 @@ public sealed class Document : BaseEntity
         {
             var arg = args.FirstOrDefault(x => x.Guid == document.Guid);
 
-            document.Number = arg.Number;
-            document.Date = arg.Date;
-            document.ClientGuid = arg.ClientGuid;
-            document.Update();
+            if (arg != null)
+            {
+                document.Number = arg.Number;
+                document.Date = arg.Date;
+                document.ClientGuid = arg.ClientGuid;
+                document.Update();
+            }
         }
 
         foreach (var arg in args)
@@ -174,7 +176,7 @@ public sealed class Document : BaseEntity
         await data.ShipmentItems.EnsureByShipmentGuids(guids);
         var items = data.ShipmentItems.List.Where(x => guids.Contains(x.ShipmentGuid)).ToList();
 
-        await SignedRange.Invoke(new S.SignedRangeArg(documents.Select(x=> x.Guid).ToHashSet(), data));
+        await SignedRange.Invoke(new SignedRangeArg(documents.Select(x => x.Guid).ToHashSet(), data));
     }
 
 
@@ -192,6 +194,6 @@ public sealed class Document : BaseEntity
             document.Update();
         }
 
-        await UnsignedRange.Invoke(new S.UnsignedRangeArg(documents.Select(x => x.Guid).ToHashSet(), data));
+        await UnsignedRange.Invoke(new UnsignedRangeArg(documents.Select(x => x.Guid).ToHashSet(), data));
     }
 }

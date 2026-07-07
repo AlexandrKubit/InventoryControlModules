@@ -1,22 +1,19 @@
 ﻿namespace Directories.Domain.Entities;
+
 using Common.Exceptions;
 using Core.Domain;
 using Directories.Domain.Data;
 using System;
 using System.Threading.Tasks;
-using R = Contracts.ResourceContract;
 
 /// <summary>
 /// Ресурс
 /// </summary>
 public sealed class Resource : BaseEntity
 {
-    private static readonly DomainEvent<R.DeletedRangeArg> DeletedRange = new();
-
-    public static void InitializeContracts()
-    {
-        R.OnDeletedRange = DeletedRange.Subscribe;
-    }
+    public record DeletedRangeArg(HashSet<Guid> Guids, IDirectoriesData Data);
+    private static DomainEvent<DeletedRangeArg> DeletedRange = new();
+    public static Action<Func<DeletedRangeArg, Task>> OnDeletedRange => DeletedRange.Subscribe;
 
     public interface IRepository : IBaseRepository<Resource>
     {
@@ -107,7 +104,7 @@ public sealed class Resource : BaseEntity
         foreach (var resource in resources)
             resource.Remove();
 
-        await DeletedRange.Invoke(new R.DeletedRangeArg(guids, data));
+        await DeletedRange.Invoke(new DeletedRangeArg(guids, data));
     }
 
     public static async Task ToArchiveRange(HashSet<Guid> guids, IDirectoriesData data)

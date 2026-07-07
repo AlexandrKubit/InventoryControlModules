@@ -1,10 +1,22 @@
 ﻿namespace Directories.Contracts;
+
 using Core.Domain;
+using Directories.Domain.Entities;
 
 public static class ClientContract
 {
+    static ClientContract()
+    {
+        Client.OnDeletedRange(OnClientDeleteRangeHandler);
+    }
+
     public record DeletedRangeArg(HashSet<Guid> Guids, IData Data);
-    public static Action<Func<DeletedRangeArg, Task>> OnDeletedRange { get; set; }
+    public static event Func<DeletedRangeArg, Task> DeletedRange = _ => Task.CompletedTask;
+
+    private static async Task OnClientDeleteRangeHandler(Client.DeletedRangeArg args)
+    {
+        await DeletedRange.Invoke(new DeletedRangeArg(args.Guids, args.Data));
+    }
 
     public interface IClientProjection
     {

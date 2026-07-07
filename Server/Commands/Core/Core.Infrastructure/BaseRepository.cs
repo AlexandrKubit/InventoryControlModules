@@ -86,7 +86,7 @@ public abstract class BaseRepository<TEntity>: BaseRepository where TEntity: Bas
     protected async Task LoadWithCacheAsync<TArgs>(
         HashSet<TArgs> args,
         Func<HashSet<TArgs>, Task<Dictionary<Guid, TEntity>>> loadFunction,
-        [CallerMemberName] string caller = "")
+        [CallerMemberName] string caller = "") where TArgs : notnull
     {
         if (!cache.TryGetValue(caller, out var cachedArgs))
         {

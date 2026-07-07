@@ -1,6 +1,6 @@
 ﻿namespace Shipment.Contracts;
 
-public class ShipmentItemContract
+public static class ShipmentItemContract
 {
     public interface IShipmentItemProjection
     {

@@ -1,4 +1,5 @@
 ﻿namespace Balance.Domain.Data;
+
 using Shipment.Contracts;
 
 public interface IBalanceData

@@ -1,6 +1,8 @@
 ﻿namespace Shipment.Domain.Entities;
+
 using Common.Exceptions;
 using Core.Domain;
+using Directories.Contracts;
 using Shipment.Domain.Data;
 using System.Threading.Tasks;
 
@@ -9,10 +11,10 @@ using System.Threading.Tasks;
 /// </summary>
 public sealed class Item : BaseEntity
 {
-    public static void InitializeContracts()
+    static Item()
     {
-        Directories.Contracts.ResourceContract.OnDeletedRange(OnResourceDeletedRangeHandler);
-        Directories.Contracts.MeasureUnitContract.OnDeletedRange(OnMeasureUnitDeletedRangeHandler);
+        ResourceContract.DeletedRange += OnResourceDeletedRangeHandler;
+        MeasureUnitContract.DeletedRange += OnMeasureUnitDeletedRangeHandler;
     }
 
     public interface IRepository : IBaseRepository<Item>

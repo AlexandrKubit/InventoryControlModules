@@ -17,10 +17,6 @@ public static class Initializer
     // вызов статических конструкторов
     public static void InitializeDomain()
     {
-        Directories.Domain.ContractsInitializer.Initialize();
-        Receipt.Domain.ContractsInitializer.Initialize();
-        Shipment.Domain.ContractsInitializer.Initialize();
-
         var type = typeof(Core.Domain.BaseEntity);
 
         var balanceAsm = Assembly.GetAssembly(typeof(Balance.Domain.Data.IBalanceData));
