@@ -15,13 +15,16 @@ public static class ReciptItemContract
 
 
     public record CreatedRangeArg(List<ItemData> Items, IData Data);
-    public static event Func<CreatedRangeArg, Task> CreatedRange = _ => Task.CompletedTask;
+    private static readonly DomainEvent<CreatedRangeArg> CreatedRange = new();
+    public static Action<Func<CreatedRangeArg, Task>> OnCreatedRange => CreatedRange.Subscribe;
 
     public record UpdatedRangeArg(List<(ItemData Old, ItemData New)> Changes, IData Data);
-    public static event Func<UpdatedRangeArg, Task> UpdatedRange = _ => Task.CompletedTask;
+    private static readonly DomainEvent<UpdatedRangeArg> UpdatedRange = new();
+    public static Action<Func<UpdatedRangeArg, Task>> OnUpdatedRange => UpdatedRange.Subscribe;
 
     public record DeletedRangeArg(List<ItemData> Items, IData Data);
-    public static event Func<DeletedRangeArg, Task> DeletedRange = _ => Task.CompletedTask;
+    private static readonly DomainEvent<DeletedRangeArg> DeletedRange = new();
+    public static Action<Func<DeletedRangeArg, Task>> OnDeletedRange => DeletedRange.Subscribe;
 
     private static async Task OnReciptItemCreatedRangeHandler(I.CreatedRangeArg args)
     {

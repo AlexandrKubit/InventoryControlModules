@@ -31,9 +31,9 @@ public class ShipmentItemRepository : BaseRepository<Item>, Item.IRepository, IS
 
     public async Task EnsureByMeasureUnitGuids(HashSet<Guid> unitGuids)
     {
-        var func = async (IEnumerable<Guid> args) =>
+        var func = async (IEnumerable<Guid> guids) =>
             await Context.ShipmentItems
-                .Where(x => args.Contains(x.MeasureUnitGuid))
+                .Where(x => guids.Contains(x.MeasureUnitGuid))
                 .Where(x => !LoadedGuids.Contains(x.Guid))
                 .ToDictionaryAsync(x => x.Guid, x => Restore(x));
 

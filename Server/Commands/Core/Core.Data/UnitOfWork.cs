@@ -71,7 +71,6 @@ public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptD
             .Options;
 
         Context = new Context(options);
-
         await Context.Database.OpenConnectionAsync();
         transaction = await Context.Database.BeginTransactionAsync(isolationLevel);
         repositories = new();

@@ -11,7 +11,8 @@ public static class ResourceContract
     }
 
     public record DeletedRangeArg(HashSet<Guid> Guids, IData Data);
-    public static event Func<DeletedRangeArg, Task> DeletedRange = _ => Task.CompletedTask;
+    private static DomainEvent<DeletedRangeArg> DeletedRange = new();
+    public static Action<Func<DeletedRangeArg, Task>> OnDeletedRange => DeletedRange.Subscribe;
 
     private static async Task OnResourceDeleteRangeHandler(Resource.DeletedRangeArg args)
     {

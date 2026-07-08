@@ -11,9 +11,12 @@ public static class ShipmentContract
     }
 
     public record SignedRangeArg(HashSet<Guid> DocumentGuids, IData Data);
-    public static event Func<SignedRangeArg, Task> SignedRange = _ => Task.CompletedTask;
+    private static readonly DomainEvent<SignedRangeArg> SignedRange = new();
+    public static Action<Func<SignedRangeArg, Task>> OnSignedRange => SignedRange.Subscribe;
+
     public record UnsignedRangeArg(HashSet<Guid> DocumentGuids, IData Data);
-    public static Func<UnsignedRangeArg, Task> UnsignedRange = _ => Task.CompletedTask;
+    private static readonly DomainEvent<UnsignedRangeArg> UnsignedRange = new();
+    public static Action<Func<UnsignedRangeArg, Task>> OnUnsignedRange => UnsignedRange.Subscribe;
 
     private static async Task OnSignedRangeHandler(Domain.Entities.Document.SignedRangeArg args)
     {

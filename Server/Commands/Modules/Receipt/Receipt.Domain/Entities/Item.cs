@@ -34,8 +34,8 @@ public sealed class Item : BaseEntity
 
     static Item()
     {
-        MeasureUnitContract.DeletedRange += OnMeasureUnitDeletedRangeHandler;
-        ResourceContract.DeletedRange += OnResourceRangeHandler;
+        MeasureUnitContract.OnDeletedRange(OnMeasureUnitDeletedRangeHandler);
+        ResourceContract.OnDeletedRange(OnResourceRangeHandler);
     }
 
     public interface IRepository : IBaseRepository<Item>

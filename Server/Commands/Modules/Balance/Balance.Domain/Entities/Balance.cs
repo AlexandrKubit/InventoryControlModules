@@ -26,15 +26,15 @@ public sealed class Balance : BaseEntity
     // подписываемся на события 
     static Balance()
     {
-        ReciptItemContract.CreatedRange += OnReceiptItemCreatedRangeHandler;
-        ReciptItemContract.UpdatedRange += OnReceiptItemUpdatedRangeHandler;
-        ReciptItemContract.DeletedRange += OnReceiptItemDeletedRangeHandler;
+        ReciptItemContract.OnCreatedRange(OnReceiptItemCreatedRangeHandler);
+        ReciptItemContract.OnUpdatedRange(OnReceiptItemUpdatedRangeHandler);
+        ReciptItemContract.OnDeletedRange(OnReceiptItemDeletedRangeHandler);
 
-        ShipmentContract.SignedRange += OnShipmentDocumentSignedRangeHandler;
-        ShipmentContract.UnsignedRange += OnShipmentDocumentUnsignedRangeHandler;
+        ShipmentContract.OnSignedRange(OnShipmentDocumentSignedRangeHandler);
+        ShipmentContract.OnUnsignedRange(OnShipmentDocumentUnsignedRangeHandler);
 
-        Directories.Contracts.MeasureUnitContract.DeletedRange += OnMeasureUnitDeletedRangeHandler;
-        Directories.Contracts.ResourceContract.DeletedRange += OnResourceDeletedRangeHandler;
+        Directories.Contracts.MeasureUnitContract.OnDeletedRange(OnMeasureUnitDeletedRangeHandler);
+        Directories.Contracts.ResourceContract.OnDeletedRange(OnResourceDeletedRangeHandler);
     }
 
     public Guid ResourceGuid { get; }
