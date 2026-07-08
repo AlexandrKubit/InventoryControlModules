@@ -152,7 +152,7 @@ public sealed class Item : BaseEntity
         var data = (IReceiptData)arg.Data;
         await data.ReceiptItems.EnsureByResourceGuids(arg.Guids);
 
-        if (data.ReceiptItems.List.Any(x => arg.Guids.Contains(x.MeasureUnitGuid)))
+        if (data.ReceiptItems.List.Any(x => arg.Guids.Contains(x.ResourceGuid)))
             throw new DomainException("Невозможно удалить ресурс т.к. он используется в поступлениях");
     }
 }

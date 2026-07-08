@@ -87,17 +87,6 @@ public sealed class Resource : BaseEntity
 
     public static async Task DeleteRange(HashSet<Guid> guids, IDirectoriesData data)
     {
-        //await data.ReceiptItems.EnsureByResourceGuids(guids);
-        //await data.Balances.EnsureByResourceGuids(guids);
-        //await data.ShipmentItems.EnsureByResourceGuids(guids);
-
-        //var receiptItems = data.ReceiptItems.List.Where(x => guids.Contains(x.ResourceGuid));
-        //var balances = data.Balances.List.Where(x => guids.Contains(x.ResourceGuid));
-        //var shipmentItems = data.ShipmentItems.List.Where(x => guids.Contains(x.ResourceGuid));
-
-        //if (receiptItems.Any() || balances.Any() || shipmentItems.Any())
-        //    throw new DomainException("Невозможно удалить ресурс, так как он используется");
-
         await data.Resources.EnsureByGuids(guids);
         var resources = data.Resources.List.Where(x => guids.Contains(x.Guid)).ToList();
 

@@ -127,7 +127,7 @@ public sealed class Item : BaseEntity
         var data = (IShipmentData)arg.Data;
         await data.ShipmentItems.EnsureByResourceGuids(arg.Guids);
 
-        if (data.ShipmentItems.List.Any(x => arg.Guids.Contains(x.MeasureUnitGuid)))
+        if (data.ShipmentItems.List.Any(x => arg.Guids.Contains(x.ResourceGuid)))
             throw new DomainException("Невозможно удалить ресурс т.к. он используется в отгрузке");
     }
 

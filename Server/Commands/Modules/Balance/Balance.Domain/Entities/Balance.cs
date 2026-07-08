@@ -208,7 +208,7 @@ public sealed class Balance : BaseEntity
         var data = (IBalanceData)arg.Data;
         await data.Balances.EnsureByResourceGuids(arg.Guids);
 
-        if (data.Balances.List.Any(x => arg.Guids.Contains(x.MeasureUnitGuid)))
+        if (data.Balances.List.Any(x => arg.Guids.Contains(x.ResourceGuid)))
             throw new DomainException("Невозможно удалить ресурс т.к. он используется в складском остатке");
     }
 }
