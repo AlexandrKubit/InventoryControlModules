@@ -1,9 +1,8 @@
 ﻿namespace Balance.Domain.Data;
 
-using Shipment.Contracts;
+using Core.Domain;
 
-public interface IBalanceData
+public interface IBalanceData : IData
 {
     public Entities.Balance.IRepository Balances { get; }
-    public ShipmentItemContract.IShipmentItemProjectionRepository ShipmentItemProjections { get; }
 }

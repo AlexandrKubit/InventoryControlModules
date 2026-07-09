@@ -3,24 +3,9 @@
 using Core.Infrastructure;
 using Directories.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using static Directories.Contracts.ResourceContract;
 
-public class ResourceRepository : BaseRepository<Resource>, Resource.IRepository, IResourceProjectionRepository
+public class ResourceRepository : BaseRepository<Resource>, Resource.IRepository
 {
-    public class ResourceProjection : IResourceProjection
-    {
-        public Guid Guid { get; }
-        public Conditions Condition { get; }
-
-        public ResourceProjection(Resource resource)
-        {
-            Guid = resource.Guid;
-            Condition = (Conditions)resource.Condition;
-        }
-    }
-    IEnumerable<IResourceProjection> IResourceProjectionRepository.List => List.Select(x => new ResourceProjection(x));
-
-
     private Resource Restore(Core.Infrastructure.Entities.Resource resource) =>
         Resource.IRepository.Restore(resource.Guid, resource.Name, resource.Condition);
     public async Task EnsureByNames(HashSet<string> names)

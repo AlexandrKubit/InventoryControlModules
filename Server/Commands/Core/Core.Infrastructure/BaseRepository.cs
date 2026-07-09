@@ -10,7 +10,15 @@ public abstract class BaseRepository
         Context = context;
     }
 
-    protected Context Context { get; private set; }
+    protected Context Context { 
+        get 
+        {
+            if (field == null)
+                throw new Exception("Контекст не проинициализирован");
+            return field; 
+        }
+        private set; 
+    }
     /// <summary>
     /// Метод вызывается в конце сценария, для того чтобы синхронизировать данные в БД и данные в коллекции
     /// Условно если где то выбросилось исключение, то никакие данные даже не будут переданы в БД

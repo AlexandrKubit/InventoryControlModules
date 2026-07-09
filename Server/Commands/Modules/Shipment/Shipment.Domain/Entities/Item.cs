@@ -2,7 +2,7 @@
 
 using Common.Exceptions;
 using Core.Domain;
-using Directories.Contracts;
+using DCE = Directories.Contracts.Events;
 using Shipment.Domain.Data;
 using System.Threading.Tasks;
 
@@ -13,8 +13,8 @@ public sealed class Item : BaseEntity
 {
     static Item()
     {
-        ResourceContract.OnDeletedRange(OnResourceDeletedRangeHandler);
-        MeasureUnitContract.OnDeletedRange(OnMeasureUnitDeletedRangeHandler);
+        DCE.OnResourceDeletedRange(OnResourceDeletedRangeHandler);
+        DCE.OnMeasureUnitDeletedRange(OnMeasureUnitDeletedRangeHandler);
     }
 
     public interface IRepository : IBaseRepository<Item>
@@ -122,7 +122,7 @@ public sealed class Item : BaseEntity
         }
     }
 
-    private static async Task OnResourceDeletedRangeHandler(ResourceContract.DeletedRangeArg arg)
+    private static async Task OnResourceDeletedRangeHandler(DCE.ResourceDeletedRangeArg arg)
     {
         var data = (IShipmentData)arg.Data;
         await data.ShipmentItems.EnsureByResourceGuids(arg.Guids);
@@ -131,7 +131,7 @@ public sealed class Item : BaseEntity
             throw new DomainException("Невозможно удалить ресурс т.к. он используется в отгрузке");
     }
 
-    private static async Task OnMeasureUnitDeletedRangeHandler(MeasureUnitContract.DeletedRangeArg arg)
+    private static async Task OnMeasureUnitDeletedRangeHandler(DCE.MeasureUnitDeletedRangeArg arg)
     {
         var data = (IShipmentData)arg.Data;
         await data.ShipmentItems.EnsureByMeasureUnitGuids(arg.Guids);

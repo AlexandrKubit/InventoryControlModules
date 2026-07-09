@@ -81,8 +81,4 @@ internal class TestData : IData, IDirectoriesData, IReceiptData, IShipmentData, 
     public Receipt.Domain.Entities.Item.IRepository ReceiptItems => Get<TestReceiptItemRepository>();
     public Shipment.Domain.Entities.Document.IRepository Shipments { get; }
     public Shipment.Domain.Entities.Item.IRepository ShipmentItems { get; }
-    public MeasureUnitContract.IMeasureUnitProjectionRepository MeasureUnitProjections { get; }
-    public ResourceContract.IResourceProjectionRepository ResourceProjections { get; }
-    public ClientContract.IClientProjectionRepository ClientProjections => Get<TestClientRepository>();
-    public ShipmentItemContract.IShipmentItemProjectionRepository ShipmentItemProjections { get; }
 }

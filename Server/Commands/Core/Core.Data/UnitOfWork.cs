@@ -5,7 +5,6 @@ using Balance.Domain.Data;
 using Balance.Infrastructure;
 using Core.Domain;
 using Core.Infrastructure;
-using Directories.Contracts;
 using Directories.Domain.Data;
 using Directories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Receipt.Domain.Data;
 using Receipt.Infrastructure;
-using Shipment.Contracts;
 using Shipment.Domain.Data;
 using Shipment.Infrastructure;
 using System;
@@ -28,12 +26,11 @@ using System.Text;
 /// </summary>
 public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptData, IShipmentData, IBalanceData
 {
-    public Context Context { get; set; }
-
+    private Context? context;
     private IServiceProvider provider;
-    private IDbContextTransaction transaction;
+    private IDbContextTransaction? transaction;
     private string connectionString;
-    private Dictionary<Type, BaseRepository> repositories;
+    private Dictionary<Type, BaseRepository> repositories = new();
 
     public UnitOfWork(IServiceProvider provider, string connectionString)
     {
@@ -47,13 +44,16 @@ public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptD
     /// </summary>
     private T Get<T>() where T : BaseRepository
     {
+        if (context == null)
+            throw new Exception("Контекст не проинициализирован");
+
         var type = typeof(T);
         if (!repositories.TryGetValue(type, out var repository))
         {
             repository = ActivatorUtilities.CreateInstance<T>(provider)
                 ?? throw new Exception($"Не удалось создать экземпляр репозитория {type.Name}");
 
-            repository.SetContext(Context);
+            repository.SetContext(context);
             repositories[type] = repository;
         }
 
@@ -70,9 +70,9 @@ public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptD
             .UseNpgsql(connectionString)
             .Options;
 
-        Context = new Context(options);
-        await Context.Database.OpenConnectionAsync();
-        transaction = await Context.Database.BeginTransactionAsync(isolationLevel);
+        context = new Context(options);
+        await context.Database.OpenConnectionAsync();
+        transaction = await context.Database.BeginTransactionAsync(isolationLevel);
         repositories = new();
     }
 
@@ -85,10 +85,16 @@ public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptD
     /// </summary>
     public async Task CommitAsync()
     {
+        if (context == null)
+            throw new Exception("Контекст не проинициализирован");
+
+        if (transaction == null)
+            throw new Exception("Транзакция не проинициализирована");
+
         foreach (var item in repositories)
             item.Value.Commit();
 
-        await Context.SaveChangesAsync();
+        await context.SaveChangesAsync();
         await transaction.CommitAsync();
         await transaction.DisposeAsync(); // освобождаем транзакцию
         transaction = null;
@@ -110,10 +116,10 @@ public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptD
             await transaction.DisposeAsync();
             transaction = null;
         }
-        if (Context != null)
+        if (context != null)
         {
-            await Context.DisposeAsync();
-            Context = null;
+            await context.DisposeAsync();
+            context = null;
         }
     }
 
@@ -122,7 +128,7 @@ public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptD
     /// 40P01 (deadlock) или 40001 (serialization failure).
     /// Используется для реализации стратегий повторных попыток.
     /// </summary>
-    public bool IsTransientConcurrencyException(Exception exception)
+    public bool IsTransientConcurrencyException(Exception? exception)
     {
         if (exception == null)
             return false;
@@ -143,6 +149,9 @@ public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptD
 
     public async Task AcquireLock(Type entityType, string key)
     {
+        if (context == null)
+            throw new Exception("Контекст не проинициализирован");
+
         // Используем SHA256 для получения 64-битного хеша
         // Вероятность коллизии 64-битного хеша на несколько порядков ниже, 
         // чем у 32-битного, что делает этот метод достаточно надежным 
@@ -152,7 +161,7 @@ public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptD
         var key1 = BitConverter.ToInt32(hashBytes, 0); // Биты 0-31
         var key2 = BitConverter.ToInt32(hashBytes, 4); // Биты 32-63
 
-        await Context.Database.ExecuteSqlRawAsync(
+        await context.Database.ExecuteSqlRawAsync(
             "SELECT pg_advisory_xact_lock(@key1, @key2)",
             new NpgsqlParameter("key1", key1),
             new NpgsqlParameter("key2", key2));
@@ -169,8 +178,4 @@ public sealed class UnitOfWork : IData, IUnitOfWork, IDirectoriesData, IReceiptD
     Receipt.Domain.Entities.Item.IRepository IReceiptData.ReceiptItems => Get<ReceiptItemRepository>();
     Shipment.Domain.Entities.Document.IRepository IShipmentData.Shipments => Get<ShipmentRepository>();
     Shipment.Domain.Entities.Item.IRepository IShipmentData.ShipmentItems => Get<ShipmentItemRepository>();
-    public MeasureUnitContract.IMeasureUnitProjectionRepository MeasureUnitProjections => Get<MeasureUnitRepository>();
-    public ResourceContract.IResourceProjectionRepository ResourceProjections => Get<ResourceRepository>();
-    public ClientContract.IClientProjectionRepository ClientProjections => Get<ClientRepository>();
-    public ShipmentItemContract.IShipmentItemProjectionRepository ShipmentItemProjections => Get<ShipmentItemRepository>();
 }

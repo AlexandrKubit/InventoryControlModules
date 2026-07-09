@@ -19,23 +19,23 @@ public sealed class Item : BaseEntity
     public record ItemData(Guid ResourceGuid, Guid MeasureUnitGuid, decimal Quantity);
 
     public record CreatedRangeArg(List<ItemData> Items, IReceiptData Data);
-    private static readonly DomainEvent<CreatedRangeArg> CreatedRange = new();
+    private static DomainEvent<CreatedRangeArg> CreatedRange = new();
     public static Action<Func<CreatedRangeArg, Task>> OnCreatedRange => CreatedRange.Subscribe;
 
     public record UpdatedRangeArg(List<(ItemData Old, ItemData New)> Changes, IReceiptData Data);
-    private static readonly DomainEvent<UpdatedRangeArg> UpdatedRange = new();
+    private static DomainEvent<UpdatedRangeArg> UpdatedRange = new();
     public static Action<Func<UpdatedRangeArg, Task>> OnUpdatedRange => UpdatedRange.Subscribe;
 
     public record DeletedRangeArg(List<ItemData> Items, IReceiptData Data);
-    private static readonly DomainEvent<DeletedRangeArg> DeletedRange = new();
+    private static DomainEvent<DeletedRangeArg> DeletedRange = new();
     public static Action<Func<DeletedRangeArg, Task>> OnDeletedRange => DeletedRange.Subscribe;
 
     #endregion
 
     static Item()
     {
-        MeasureUnitContract.OnDeletedRange(OnMeasureUnitDeletedRangeHandler);
-        ResourceContract.OnDeletedRange(OnResourceRangeHandler);
+        Events.OnMeasureUnitDeletedRange(OnMeasureUnitDeletedRangeHandler);
+        Events.OnResourceDeletedRange(OnResourceRangeHandler);
     }
 
     public interface IRepository : IBaseRepository<Item>
@@ -71,17 +71,17 @@ public sealed class Item : BaseEntity
         var resourceGuids = args.Select(x => x.ResourceGuid).ToHashSet();
         var unitGuids = args.Select(x => x.MeasureUnitGuid).ToHashSet();
 
-        await data.ResourceProjections.EnsureByGuids(resourceGuids);
-        await data.MeasureUnitProjections.EnsureByGuids(unitGuids);
+        var resources = await Lookup.GetActiveResourcesAsync(resourceGuids, data);
+        var units = await Lookup.GetActiveMeasureUnitsAsync(unitGuids, data);
 
         foreach (var arg in args)
         {
-            var resource = data.ResourceProjections.List.FirstOrDefault(x => x.Guid == arg.ResourceGuid);
-            if (resource == null || resource.Condition == ResourceContract.Conditions.Archive)
+            var resource = resources.FirstOrDefault(x => x.Guid == arg.ResourceGuid);
+            if (resource == null)
                 throw new DomainException("Ресурс удален или переведен в архив");
 
-            var unit = data.MeasureUnitProjections.List.FirstOrDefault(x => x.Guid == arg.MeasureUnitGuid);
-            if (unit == null || unit.Condition == MeasureUnitContract.Conditions.Archive)
+            var unit = units.FirstOrDefault(x => x.Guid == arg.MeasureUnitGuid);
+            if (unit == null)
                 throw new DomainException("Единица измерения удалена или переведена в архив");
 
             var item = new Item(Guid.CreateVersion7(), arg.ReceiptGuid, arg.ResourceGuid, arg.MeasureUnitGuid, arg.Quantity);
@@ -104,11 +104,42 @@ public sealed class Item : BaseEntity
         await data.ReceiptItems.EnsureByGuids(guids);
         var items = data.ReceiptItems.List.Where(x => guids.Contains(x.Guid)).ToList();
 
+        HashSet<Guid> resourceGuids = [];
+        HashSet<Guid> unitGuids = [];
+
+        foreach (var item in items)
+        {
+            var arg = args.First(x => x.Guid == item.Guid);
+
+            if (item.ResourceGuid != arg.ResourceGuid)
+                resourceGuids.Add(arg.ResourceGuid);
+
+            if (item.MeasureUnitGuid != arg.MeasureUnitGuid)
+                unitGuids.Add(arg.MeasureUnitGuid);
+        }
+
+        var resources = await Lookup.GetActiveResourcesAsync(resourceGuids, data);
+        var units = await Lookup.GetActiveMeasureUnitsAsync(unitGuids, data);
+
         List<(ItemData Old, ItemData New)> сhanges = [];
 
         foreach (var item in items)
         {
             var arg = args.First(x => x.Guid == item.Guid);
+
+            // логика в том что мы не можем изменить единицу измерения или ресурс на тот который в архиве
+            // но при этом если не меняем, то можем использовать архивную
+            if (item.ResourceGuid != arg.ResourceGuid)
+            {
+                if (resources.FirstOrDefault(x => x.Guid == arg.ResourceGuid) == null)
+                    throw new DomainException("Ресурс удален или переведен в архив");
+            }
+
+            if (item.MeasureUnitGuid != arg.MeasureUnitGuid)
+            {
+                if (units.FirstOrDefault(x => x.Guid == arg.MeasureUnitGuid) == null)
+                    throw new DomainException("Единица измерения удалена или переведена в архив");
+            }
 
             ItemData old = new(item.ResourceGuid, item.MeasureUnitGuid, item.Quantity);
             ItemData _new = new(arg.ResourceGuid, arg.MeasureUnitGuid, arg.Quantity);
@@ -138,7 +169,7 @@ public sealed class Item : BaseEntity
         ));
     }
 
-    private static async Task OnMeasureUnitDeletedRangeHandler(MeasureUnitContract.DeletedRangeArg arg)
+    private static async Task OnMeasureUnitDeletedRangeHandler(Events.MeasureUnitDeletedRangeArg arg)
     {
         var data = (IReceiptData)arg.Data;
         await data.ReceiptItems.EnsureByMeasureUnitGuids(arg.Guids);
@@ -147,7 +178,7 @@ public sealed class Item : BaseEntity
             throw new DomainException("Невозможно удалить единицу измерения т.к. она используется в поступлениях");
     }
 
-    private static async Task OnResourceRangeHandler(ResourceContract.DeletedRangeArg arg)
+    private static async Task OnResourceRangeHandler(Events.ResourceDeletedRangeArg arg)
     {
         var data = (IReceiptData)arg.Data;
         await data.ReceiptItems.EnsureByResourceGuids(arg.Guids);

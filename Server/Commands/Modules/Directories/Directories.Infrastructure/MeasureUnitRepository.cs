@@ -3,23 +3,9 @@
 using Core.Infrastructure;
 using Directories.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using static Directories.Contracts.MeasureUnitContract;
 
-public class MeasureUnitRepository : BaseRepository<MeasureUnit>, MeasureUnit.IRepository, IMeasureUnitProjectionRepository
+public class MeasureUnitRepository : BaseRepository<MeasureUnit>, MeasureUnit.IRepository
 {
-    public class MeasureUnitProjection : IMeasureUnitProjection
-    {
-        public Guid Guid { get; }
-        public Conditions Condition { get; }
-
-        public MeasureUnitProjection(MeasureUnit unit)
-        {
-            Guid = unit.Guid;
-            Condition = (Conditions)unit.Condition;
-        }
-    }
-    IEnumerable<IMeasureUnitProjection> IMeasureUnitProjectionRepository.List => List.Select(x => new MeasureUnitProjection(x));
-
     private MeasureUnit Restore(Core.Infrastructure.Entities.MeasureUnit unit) =>
         MeasureUnit.IRepository.Restore(unit.Guid, unit.Name, unit.Condition);
 

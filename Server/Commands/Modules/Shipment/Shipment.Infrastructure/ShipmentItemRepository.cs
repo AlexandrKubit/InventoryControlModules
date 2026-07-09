@@ -3,29 +3,9 @@
 using Core.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Shipment.Domain.Entities;
-using static Shipment.Contracts.ShipmentItemContract;
 
-public class ShipmentItemRepository : BaseRepository<Item>, Item.IRepository, IShipmentItemProjectionRepository
+public class ShipmentItemRepository : BaseRepository<Item>, Item.IRepository
 {
-
-    public class ShipmentItemProjection : IShipmentItemProjection
-    {
-        public Guid ShipmentGuid { get; }
-        public Guid ResourceGuid { get; }
-        public Guid MeasureUnitGuid { get; }
-        public decimal Quantity { get; }
-
-        public ShipmentItemProjection(Item item)
-        {
-            ShipmentGuid = item.ShipmentGuid;
-            ResourceGuid = item.ResourceGuid;
-            MeasureUnitGuid = item.MeasureUnitGuid;
-            Quantity = item.Quantity;
-        }
-    }
-
-    IEnumerable<IShipmentItemProjection> IShipmentItemProjectionRepository.List => List.Select(x => new ShipmentItemProjection(x));
-
     private Item Restore(Core.Infrastructure.Entities.ShipmentItem item) =>
         Item.IRepository.Restore(item.Guid, item.ShipmentGuid, item.ResourceGuid, item.MeasureUnitGuid, item.Quantity);
 

@@ -15,11 +15,11 @@ public sealed class Document : BaseEntity
     // поэтому баланс подписывается на эти события
     #region Events
     public record SignedRangeArg(HashSet<Guid> DocumentGuids, IData Data);
-    private static readonly DomainEvent<SignedRangeArg> SignedRange = new(); // один подписчик - баланс на складе, порядок не важен  
+    private static DomainEvent<SignedRangeArg> SignedRange { get; } = new(); // один подписчик - баланс на складе, порядок не важен  
     public static Action<Func<SignedRangeArg, Task>> OnSignedRange => SignedRange.Subscribe;
 
     public record UnsignedRangeArg(HashSet<Guid> DocumentGuids, IData Data);
-    private static readonly DomainEvent<UnsignedRangeArg> UnsignedRange = new(); // один подписчик - баланс на складе, порядок не важен  
+    private static DomainEvent<UnsignedRangeArg> UnsignedRange { get; } = new(); // один подписчик - баланс на складе, порядок не важен  
     public static Action<Func<UnsignedRangeArg, Task>> OnUnsignedRange => UnsignedRange.Subscribe;
 
     #endregion

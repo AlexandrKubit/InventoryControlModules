@@ -24,7 +24,7 @@ public class DomainEvent<TArg>
     /// <param name="handler"></param>
     public void Subscribe(Func<TArg, Task> handler)
     {
-        if (handler != null)
+        if (handler != null && handler.Method.DeclaringType != null)
         {
             Type declaringType = handler.Method.DeclaringType;
             dictionary[declaringType] = handler;

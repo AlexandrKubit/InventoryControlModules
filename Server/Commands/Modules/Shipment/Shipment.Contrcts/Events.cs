@@ -2,9 +2,9 @@
 
 using Core.Domain;
 
-public static class ShipmentContract
+public static class Events
 {
-    static ShipmentContract()
+    static Events()
     {
         Domain.Entities.Document.OnSignedRange(OnSignedRangeHandler);
         Domain.Entities.Document.OnUnsignedRange(OnUnsignedRangeHandler);

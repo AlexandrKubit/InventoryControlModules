@@ -3,23 +3,9 @@
 using Core.Infrastructure;
 using Directories.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using static Directories.Contracts.ClientContract;
 
-public class ClientRepository : BaseRepository<Client>, Client.IRepository, IClientProjectionRepository
+public class ClientRepository : BaseRepository<Client>, Client.IRepository
 {
-    public class ClientProjection : IClientProjection
-    {
-        public Guid Guid { get; }
-        public Conditions Condition { get; }
-
-        public ClientProjection(Client client)
-        {
-            Guid = client.Guid;
-            Condition = (Conditions)client.Condition;
-        }
-    }
-    IEnumerable<IClientProjection> IClientProjectionRepository.List => List.Select(x => new ClientProjection(x));
-
 
     /// использует статический protected метод Restore, объявленный в Client.IRepository 
     /// единственный способ восстановить сущность из БД, не нарушая её инкапсуляцию (конструктор приватный)

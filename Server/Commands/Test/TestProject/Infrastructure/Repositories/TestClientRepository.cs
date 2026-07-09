@@ -1,24 +1,10 @@
-﻿using Directories.Contracts;
+﻿namespace Tests.Infrastructure;
+
 using Directories.Domain.Entities;
 using TestProject.Infrastructure;
-using static Directories.Contracts.ClientContract;
-namespace Tests.Infrastructure;
 
-internal class TestClientRepository : TestBaseRepository<Client>, Client.IRepository, ClientContract.IClientProjectionRepository
+internal class TestClientRepository : TestBaseRepository<Client>, Client.IRepository
 {
-    public class ClientProjection : IClientProjection
-    {
-        public Guid Guid { get; }
-        public Conditions Condition { get; }
-
-        public ClientProjection(Client client)
-        {
-            Guid = client.Guid;
-            Condition = (Conditions)client.Condition;
-        }
-    }
-    IEnumerable<IClientProjection> IClientProjectionRepository.List => List.Select(x => new ClientProjection(x));
-
     // для интеграциооных тестов
     public override void InitData()
     {
