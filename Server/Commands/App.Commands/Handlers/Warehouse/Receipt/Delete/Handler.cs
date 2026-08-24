@@ -10,7 +10,7 @@ using App.Commands.Base;
 [RequestRoute("/Warehouse/Receipt/Delete", RequestRouteAttribute.Types.Command)]
 public class Handler(IReceiptData data, IUnitOfWork uow) : IRequestHandler<Request, Guid>
 {
-    System.Data.IsolationLevel IBaseRequestHandler.IsolationLevel => System.Data.IsolationLevel.RepeatableRead;
+    System.Data.IsolationLevel IBaseRequestHandler.IsolationLevel => System.Data.IsolationLevel.ReadCommitted;
 
     public async Task<Guid> HandleAsync(Request request)
     {
