@@ -1,5 +1,7 @@
 ﻿namespace Core.Domain;
 
+// сознательно убрали порядок, т.к. между модулями его быть не может
+// внутри можуля порядок можно было бы использовать
 public class DomainEvent<TArg>
 {
     private readonly Dictionary<Type, Func<TArg, Task>> dictionary = new();

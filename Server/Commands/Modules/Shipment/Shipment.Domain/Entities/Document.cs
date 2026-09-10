@@ -4,12 +4,17 @@ using Common.Exceptions;
 using Core.Domain;
 using Shipment.Domain.Data;
 using System.Threading.Tasks;
-
+using DCE = Directories.Contracts.Events;
 /// <summary>
 /// Документ отгрузки
 /// </summary>
 public sealed class Document : BaseEntity
 {
+    static Document()
+    {
+        DCE.OnClientDeletedRange(OnClientDeletedRangeHandler);
+    }
+
     // при подписи и отзыве отгрузки необходимо изменять кол-во ресурсов на складе
     // ресурсы на складе просто так нельзя удалять, добавлять или изменять на складе
     // поэтому баланс подписывается на эти события
@@ -195,5 +200,14 @@ public sealed class Document : BaseEntity
         }
 
         await UnsignedRange.Invoke(new UnsignedRangeArg(documents.Select(x => x.Guid).ToHashSet(), data));
+    }
+
+    private static async Task OnClientDeletedRangeHandler(DCE.ClientDeletedRangeArg arg)
+    {
+        var data = (IShipmentData)arg.Data;
+        await data.Shipments.EnsureByClients(arg.Guids);
+
+        if (data.Shipments.List.Any(x => arg.Guids.Contains(x.ClientGuid)))
+            throw new DomainException("Невозможно удалить клиента т.к. он используется в отгрузке");
     }
 }
