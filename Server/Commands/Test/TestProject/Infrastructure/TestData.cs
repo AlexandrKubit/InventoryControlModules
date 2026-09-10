@@ -23,7 +23,7 @@ internal class TestData : IData, IDirectoriesData, IReceiptData, IShipmentData, 
         types.ForEach(t => RuntimeHelpers.RunClassConstructor(t.TypeHandle));
 
         var directoriesAsm = Assembly.GetAssembly(typeof(Directories.Domain.Data.IDirectoriesData));
-        types = balanceAsm.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(type)).ToList();
+        types = directoriesAsm.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(type)).ToList();
         types.ForEach(t => RuntimeHelpers.RunClassConstructor(t.TypeHandle));
 
         var receiptAsm = Assembly.GetAssembly(typeof(Receipt.Domain.Data.IReceiptData));
